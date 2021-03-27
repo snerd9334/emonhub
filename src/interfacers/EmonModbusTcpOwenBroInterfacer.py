@@ -20,7 +20,7 @@ if needed, please change the function to read_input_registers()
 
 class EmonModbusTcpInterfacer(EmonHubInterfacer):
 
-    def __init__(self, name, modbus_IP='192.168.1.60', modbus_port=9999): #9999 is the default port OB use
+    def __init__(self, name, modbus_IP='192.168.1.10', modbus_port=0):
         """Initialize Interfacer
         com_port (string): path to COM port
         """
@@ -34,7 +34,7 @@ class EmonModbusTcpInterfacer(EmonHubInterfacer):
         # open connection
         if pymodbus_found:
             self._log.info("pymodbus installed")
-            self._log.debug("EmonModbusTcpInterfacer args: %s - %d", modbus_IP, modbus_port)
+            self._log.debug("EmonModbusTcpInterfacer args: %s - %s", modbus_IP, modbus_port)
             self._con = self._open_modTCP(modbus_IP, modbus_port)
             if self._modcon:
                 self._log.info("Modbustcp client Connected")
@@ -59,7 +59,7 @@ class EmonModbusTcpInterfacer(EmonHubInterfacer):
         try:
             c = ModbusClient(modbus_IP, modbus_port)
             if c.connect():
-                self._log.info("Opening modbusTCP connection: %d @ %s", modbus_port, modbus_IP)
+                self._log.info("Opening modbusTCP connection: %s @ %s", modbus_port, modbus_IP)
                 self._modcon = True
             else:
                 self._log.debug("Connection failed")
