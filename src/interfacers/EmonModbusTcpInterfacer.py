@@ -5,6 +5,7 @@ try:
     from pymodbus.constants import Endian
     from pymodbus.payload import BinaryPayloadDecoder
     from pymodbus.client.sync import ModbusTcpClient as ModbusClient
+    from pymodbus.transaction import ModbusRtuFramer as ModbusFramer
     pymodbus_found = True
 except ImportError:
     pymodbus_found = False
@@ -53,13 +54,12 @@ class EmonModbusTcpInterfacer(EmonHubInterfacer):
             self._log.debug("Closing tcp port")
             self._con.close()
 
-    def _open_modTCP(self, modbus_IP, modbus_port):
+    def _open_modTCP(self, modbus_IP, modbus_port, framer=ModbusFramer):
         """ Open connection to modbus device """
 
         try:
-            c = ModbusClient(modbus_IP, modbus_port)
+            c = ModbusClient(modbus_IP, modbus_port, framer=ModbusFramer)
             if c.connect():
-                self._log.info("Opening modbusTCP connection: %s @ %s", modbus_port, modbus_IP)
                 self._modcon = True
             else:
                 self._log.debug("Connection failed")
@@ -164,8 +164,8 @@ class EmonModbusTcpInterfacer(EmonHubInterfacer):
                     self._log.debug("reading register #: %s, qty #: %s, unit #: %s", register, qty, unitId)
 
                     try:
-                        self.rVal = self._con.read_holding_registers(register - 1, qty, unit=unitId)
-                        assert self.rVal.function_code < 0x80
+                        self.rVal = self._con.read_input_registers(address=0x0010, count=qty, unit=unitId)
+                    #    assert self.rVal.function_code < 0x80
                     except Exception as e:
                         self._log.error("Connection failed on read of register: %s : %s", register, e)
                         self._modcon = False
