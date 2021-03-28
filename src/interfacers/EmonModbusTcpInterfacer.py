@@ -35,7 +35,6 @@ class EmonModbusTcpInterfacer(EmonHubInterfacer):
         # open connection
         if pymodbus_found:
             self._log.info("pymodbus installed")
-            self._log.debug("EmonModbusTcpInterfacer args: %s - %s", modbus_IP, modbus_port)
             self._con = self._open_modTCP(modbus_IP, modbus_port)
             if self._modcon:
                 self._log.info("Modbustcp client Connected")
@@ -151,7 +150,7 @@ class EmonModbusTcpInterfacer(EmonHubInterfacer):
                 # at this stage, we don't have any invalid datacode(s)
                 # so we can loop and read registers
                 for idx, rName in enumerate(rNames):
-                    register = int(registers[idx])
+                    register = int(registers[idx], 0)
                     if UnitIds is not None:
                         unitId = int(UnitIds[idx])
                     else:
@@ -164,7 +163,7 @@ class EmonModbusTcpInterfacer(EmonHubInterfacer):
                     self._log.debug("reading register #: %s, qty #: %s, unit #: %s", register, qty, unitId)
 
                     try:
-                        self.rVal = self._con.read_input_registers(address=0x0010, count=qty, unit=unitId)
+                        self.rVal = self._con.read_input_registers(address=register, count=qty, unit=unitId)
                     #    assert self.rVal.function_code < 0x80
                     except Exception as e:
                         self._log.error("Connection failed on read of register: %s : %s", register, e)
